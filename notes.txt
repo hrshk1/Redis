@@ -1,0 +1,81 @@
+diff bw caching and memoization
+https://chatgpt.com/share/6978c7fc-1290-8006-b09c-297dc3467b26
+
+full workflow of redis
+https://docs.google.com/document/d/1wFsQWjr15hqv0Vq1kTh3ELiurv4hG0L0ZTlYc2EsofM/edit?usp=sharing
+
+The video explains that cached Redis data needs to be invalidated in scenarios where the underlying data in the main database changes, making the cached data stale or incorrect.
+
+The speaker provides an example related to product stock:
+
+If a product's stock is initially 10 and is cached (9:00).
+When a user places an order for 2 quantities, the actual stock in the main database becomes 8 (9:18 - 9:29).
+If another client requests the product, they would still receive the cached value of 10 stock, which is no longer accurate (9:34 - 9:42).
+To address this, the video describes two methods for invalidating cached data:
+
+Manual Invalidation: This involves explicitly clearing or invalidating the cache when a change occurs in the main database that affects the cached data. For instance, when an order is successfully placed and the product's stock is updated, the associated cache for that product is immediately invalidated (9:44 - 10:05).
+TTL (Time To Live): This method involves setting an expiration time for the cached data when it is stored in Redis. Once this time expires, the cached data automatically becomes invalid and is removed (10:17 - 10:41). The next request for that data will then fetch it from the main database, ensuring fresh data.
+
+
+//getting started
+go to redis-->make account-->download redisinsight (GUI type interface) -->connect your db-->craete your keys
+
+using redis cli
+install redis cli from redis website 
+see redis cli is not available for windows so use memurai-cli 
+download memurai-cli and open terminal and write memurai-cli and now whatever code of redis-cli you have to write just write without using the word redis-cli
+also when connecting to the databse created on browser make sure to first exit from any already existing memurai port you are on
+
+//learn get and set command
+if you want to learn any command just go to redis docs-->commands
+or you can also search for redis cheatsheet
+you can write commands in capital or small both
+
+KEY *  --> to print all keys
+MSET key1 "val1" key2 "val2" --> set multiple key values pair
+SETNX --> sets the key only if it doesn't exist previously
+MGET --> similar to mset, just write multiple keys and their values will be displayed
+TYPE --> gives the datatype of the key
+DEL --> can be used to delete single or multiple keys as well just write key names with space
+EXISTS --> tells whether the key exists or not 1 means exits 0 means not exist
+TTL -->tells the time to limit for key to die. if the key exist but no ttl was set then -1 and if key doesn't exist then -2 
+EXPIRE key time --> sets the TTL 
+SETX key seconds value --> sets ttl and key together
+GETRANGE key startind endinx --> gives a part of string. can be used only on strings and uses 0 based indexing
+SETRANGE key offset value --> replaces the string's range
+
+//LIST
+--> In Redis, a List is a simple sequence of strings, sorted by the order in which they were added. If you are familiar with Linked Lists in C++, you already understand how they work under the hood.
+Unlike an array where you might access elements by an index (which can be slow if you have to shift everything), a Redis List is optimized for adding elements to the head (start) or tail (end) extremely quickly.
+LPUSH key element --> creates a list(if it doesn't exist) and adds element from the left side
+RPUSH --> adds elemn from right, also to add multiple elements using LPUSH or RPUSH jst simply write with inverted commas and space
+LLEN key --> gives the length of the key
+LRANGE key start end --> gives the list of elements with that index. if you write end ind as -1 then it will give from start to the last index
+LPOP & RPOP key count --> pops the count no. of elements from left or right. if no count then pops single element
+read blpop and blmove from redic docs https://redis.io/docs/latest/develop/data-types/lists/
+
+//SETS A Redis set is an unordered collection of unique strings (members)
+you have access members by writing them whole 
+study from docs https://redis.io/docs/latest/develop/data-types/sets/
+
+//SORTED SET-->similar to set which have a rank which you give at the time of setting
+study from doc
+
+//Hash --> in this values are stored in key value pairs
+
+/********************************************************************/
+REDIS IN NODE
+initialise the frontend and backend of the project
+now in server npm i ioredis
+now here we are purposefully creating a promise of 2 seconds to indicate a heavy api 
+to implement REDIS
+in server npm i ioredis
+import Redis from 'ioredis';  -->in server/app.js
+const redis = new Redis({
+    host: "redis",
+    port: ,
+    password : "",
+});
+get the above details from your databse
+
+

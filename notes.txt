@@ -83,3 +83,4 @@ also you can manually invalidate the cache by using del functionality at the tim
 mostly redis is uesd in the middleware. see the implementation
 also shown how to apply rate limiter in app.js to allow calling the cache only few number of times
 
+note- ":" is used to create a folder in redis though they are not really folders but gui like redis insight mimicks them as folder

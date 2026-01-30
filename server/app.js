@@ -15,8 +15,12 @@ redis.on('connect',()=>{
     console.log('Connected to Redis');
 });
 
-app.get('/', (req, res) => {
-    res.send("Hello, World!");
+app.get('/', async (req, res) => {
+    //rate limiter
+    const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const requestCount = await redis.incr(`${clientIp}:request_count`);
+    console.log(clientIp);
+    res.send(`Hello, World!${requestCount}`);
 });
 
 app.get('/products',getCachedData("products") , async (req, res) => {

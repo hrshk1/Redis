@@ -78,4 +78,8 @@ const redis = new Redis({
 });
 get the above details from your databse
 see app.js to know how things work
+also you can manually invalidate the cache by using del functionality at the time when any other function is being executed
+
+mostly redis is uesd in the middleware. see the implementation
+also shown how to apply rate limiter in app.js to allow calling the cache only few number of times
 

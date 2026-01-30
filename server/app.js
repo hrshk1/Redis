@@ -1,6 +1,7 @@
 import express from 'express';
 import { getProducts, getProductDetail } from './api/products.js';
 import Redis from 'ioredis';
+import { getCachedData } from './middleware/redis.js';
 
 
 const app = express();
@@ -18,15 +19,7 @@ app.get('/', (req, res) => {
     res.send("Hello, World!");
 });
 
-app.get('/products', async (req, res) => {
-    const isExist = await redis.exists('products');
-    if(isExist){
-        const cachedProducts = await redis.get('products');
-        console.log('Serving from cache');
-        if(cachedProducts){
-            return res.json({products: JSON.parse(cachedProducts)});
-        }
-    }
+app.get('/products',getCachedData("products") , async (req, res) => {
     const products = await getProducts();
     await redis.setex('products',40, JSON.stringify(products));
     res.json({products});

@@ -1,7 +1,7 @@
 import express from 'express';
 import { getProducts, getProductDetail } from './api/products.js';
 import Redis from 'ioredis';
-import { getCachedData } from './middleware/redis.js';
+import { getCachedData, rateLimiter } from './middleware/redis.js';
 
 
 const app = express();
@@ -15,15 +15,11 @@ redis.on('connect',()=>{
     console.log('Connected to Redis');
 });
 
-app.get('/', async (req, res) => {
-    //rate limiter
-    const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const requestCount = await redis.incr(`${clientIp}:request_count`);
-    console.log(clientIp);
+app.get('/', rateLimiter({limit: 10, time: 60, key: "home"}), async (req, res) => {
     res.send(`Hello, World!${requestCount}`);
 });
 
-app.get('/products',getCachedData("products") , async (req, res) => {
+app.get('/products', rateLimiter({limit: 10, time: 60, key: "products"}), getCachedData("products") , async (req, res) => {
     const products = await getProducts();
     await redis.setex('products',40, JSON.stringify(products));
     res.json({products});

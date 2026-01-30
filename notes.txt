@@ -77,5 +77,5 @@ const redis = new Redis({
     password : "",
 });
 get the above details from your databse
-
+see app.js to know how things work
 
